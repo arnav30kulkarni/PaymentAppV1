@@ -18,52 +18,54 @@ router.get("/balance",authMiddleware,async(req,res)=>{
     })
 })
 
-router.post("/transfer",authMiddleware,async(req,res)=>{
+router.post("/transfer", authMiddleware, async (req, res) => {
     const session = await Account.startSession();
-    const {amount,to} = req.body;
+    session.startTransaction(); 
 
-    const account= await Account.findOne({
-        userId:req.userId
-    }).session(session);
+    try {
+        const { amount, to } = req.body;
 
-    if(!account|| account.balance<amount){
-        await session.abortTransaction();
-        res.json({
-            msg:"Insufficient Balance"
-        })
-    }
+        const account = await Account.findOne({ userId: req.userId }).session(session);
 
-    const toAccount = await Account.findOne({
-        userId:to
-    }).session(session);
-
-    if(!toAccount){
-        await session.abortTransaction();
-        res.json({
-            msg:"The recipient account does not exist"
-        })
-    }
-
-    await Acccount.updateOne({
-        userId:req.userId
-    },{
-        $inc:{
-            balance:-amount
+        if (!account || account.balance < amount) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ msg: "Insufficient Balance" });
         }
-    }).session(session);
 
-    await Account.updateOne({
-        userId:to
-    },{
-        $ince:{
-            balance:amount
+        const toAccount = await Account.findOne({ userId: to }).session(session);
+
+        if (!toAccount) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ msg: "The recipient account does not exist" });
         }
-    }).session(session);
 
-    await session.commitTransaction();
-    res.json({
-        msg:"Transfer successful!"
-    })
-})
+        
+        await Account.updateOne(
+            { userId: req.userId },
+            { $inc: { balance: -amount } } 
+        ).session(session);
+
+        
+        await Account.updateOne(
+            { userId: to },
+            { $inc: { balance: amount } } 
+        ).session(session);
+
+        
+        await session.commitTransaction();
+        session.endSession();
+
+        res.json({ msg: "Transfer successful!" });
+
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error(error);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
 
 module.exports=router;

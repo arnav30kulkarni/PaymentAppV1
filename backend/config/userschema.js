@@ -1,6 +1,4 @@
 const mongoose=require("mongoose");
-const connectDb=require("./connectDb");
-connectDb();
 
 const userSchema= new mongoose.Schema({
     firstname:{

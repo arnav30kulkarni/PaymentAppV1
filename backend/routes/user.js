@@ -16,7 +16,8 @@ const signupSchema=zod.object({
 
 router.post("/signup",async(req,res)=>{
     const body=req.body;
-    if(!signupSchema.safeParse(body).success){
+    const parsedSignup=signupSchema.safeParse(body);
+    if(!parsedSignup.success){
         return res.status(400).json({
             msg:"Invalid inputs"
         })
@@ -64,7 +65,8 @@ const loginSchema=zod.object({
 router.post("/signin",async(req,res)=>{
     const body=req.body;
 
-    if(!loginSchema.safeParse(body).success){
+    const parsedSignin=loginSchema.safeParse(body);
+    if(!parsedSignin.success){
         return res.status(403).json({
             msg:"Invalid inputs"
         })
@@ -73,7 +75,7 @@ router.post("/signin",async(req,res)=>{
         username:body.username,
         password:body.password
     })
-    if(!user?._id){
+    if(!user._id){
         res.status(404).json({
             msg:"User not found"
         })
@@ -102,7 +104,9 @@ router.put("/",authMiddleware,async(req,res)=>{
         })
     }
     const updateUser=await User.updateOne({
-        Id:req.userId
+        _id:req.userId
+    },{
+        $set:body
     })
 
     res.json({
@@ -112,17 +116,13 @@ router.put("/",authMiddleware,async(req,res)=>{
 
 router.get("/bulk",async(req,res)=>{
     const filter = req.query.filter || "";
-    const users=await User.find({
-        $or:[{
-            firstname:{
-                $regex:filter,
-            }
-        },{
-            lastname:{
-                $regex:filter
-            }
-        }]
+    const users = await User.find({
+    $or: [
+        { firstname: { $regex: filter, $options: "i" } },
+        { lastname: { $regex: filter, $options: "i" } },
+    ]
     });
+
 
     res.json({
         users:users.map(user=>{
