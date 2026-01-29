@@ -24,17 +24,17 @@ const Signin=()=>{
                     <Inputbox onChange={(e)=>{
                         setPassword(e.target.value);
                     }} label={"password"} placeholder={"Enter your password"}/>
-                    <Button onClick={
+                    <Button onClick={()=>{
                         axios.post("http://localhost:4500/api/v1/user/signin",{
                             username,
                             password
                         })
                             .then((res)=>{
-                                localStorage.setItem(res.data.token);
+                                localStorage.setItem("token",res.data.token);
                                 navigate("/dashboard");
 
                             })
-                    } text={"Login"}/>
+                    }} text={"Login"}/>
                     <Bottomwarning text="Don't have an account?" linktext={"Signup now!"} to={"/signup"}/>
                 </div>
             </div>
