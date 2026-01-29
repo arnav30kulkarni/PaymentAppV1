@@ -10,11 +10,11 @@ const SendMoney=()=>{
                     <div className="flex ml-2 mt-6">
                         <div className="rounded-full bg-green-500 justify-center h-12 w-12 ml-1 mr-1">
                             <div className="flex flex-col justify-center text-white h-full text-center">
-                                U
+                                T
                             </div>
                         </div>
                         <div className="font-medium text-lg px-2 py-1 ">
-                                Arnav Kulkarni
+                                Tanmay Kulkarni
                         </div>
                     </div>
                     <div className="font-bold text-md mt-1 ml-2 px-1">
