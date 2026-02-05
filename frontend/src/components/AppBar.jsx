@@ -4,7 +4,7 @@ const Appbar = ()=>{
     return(
         <div className="shadow flex justify-between h-14">
             <div className="flex flex-col justify-center h-full ml-4 font-bold text-lg">
-                Paytm App
+                Payment Application
             </div>
             <div className="flex items-center">
                 <div className="flex items-center mr-4 h-full">
