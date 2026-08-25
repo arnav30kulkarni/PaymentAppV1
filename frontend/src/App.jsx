@@ -9,6 +9,7 @@ const Dashboard =React.lazy(()=>import('./pages/Dashboard'));
 const SendMoney =React.lazy(()=>import('./pages/SendMoney'));
 const HomeRedirect=React.lazy(()=>import('./pages/HomeRedirect'));
 const Landing=React.lazy(()=>import('./pages/Landing'));
+const NewLanding=React.lazy(()=>import('./pages/newLanding'));
 const Profile=React.lazy(()=>import('./pages/ProfilePage'));
 const Modify=React.lazy(()=>import('./pages/ModifyUser'))
 
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           //Landing
           <Route path="/" element={<Suspense fallback="loading..."><Landing/></Suspense>}/>
+          <Route path="/new-landing" element={<Suspense fallback="loading..."><NewLanding/></Suspense>}/>
 
           //Redirection
           <Route path="/my" element={<Suspense fallback="loading..."><HomeRedirect/></Suspense>}/>
