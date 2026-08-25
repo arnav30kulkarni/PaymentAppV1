@@ -1,7 +1,15 @@
+import { useState } from "react"
+import NewSignIn from "./newSignin"
 
 const NewLanding = ()=>{
+
+    const [signIn,setSignIn] = useState(false)
+    
  return(
         <main className="min-h-screen overflow-hidden bg-[#f4f7f3] text-(--color-primary)">
+
+            {signIn && <NewSignIn onClose={() => setSignIn(false)} />}
+            
             <div className="relative mx-auto max-w-7xl px-6 pb-12 pt-5 sm:px-10 lg:px-14">
                 <div className="pointer-events-none absolute -right-32 -top-40 h-96 w-96 rounded-full bg-[#d9f2df] blur-3xl" />
                 <header className="relative flex items-center justify-between">
@@ -37,7 +45,7 @@ const NewLanding = ()=>{
                             Send money, split bills, and keep your everyday finances moving from one beautifully simple place.
                         </p>
                         <div className="mt-9 flex flex-wrap items-center gap-3">
-                            <button type="button" className="rounded-full bg-(--color-primary) px-6 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(20,20,20,0.16)] transition-transform hover:-translate-y-0.5">
+                            <button type="button" onClick={() => setSignIn((currentSignIn) => !currentSignIn)} className="rounded-full bg-(--color-primary) px-6 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(20,20,20,0.16)] transition-transform hover:-translate-y-0.5">
                                 Get started <span className="ml-2">-&gt;</span>
                             </button>
                             <button type="button" className="rounded-full border border-[#cbd7ce] bg-white/70 px-6 py-3 text-sm font-bold text-(--color-primary) transition-colors hover:bg-white">
