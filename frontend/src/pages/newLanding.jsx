@@ -1,14 +1,17 @@
 import { useState } from "react"
 import NewSignIn from "./newSignin"
+import NewSignUp from "./newSignUp"
 
 const NewLanding = ()=>{
 
-    const [signIn,setSignIn] = useState(false)
+    const [signIn,setSignIn] = useState(false);
+    const [signUp,setSignUp] = useState(false);
     
  return(
         <main className="min-h-screen overflow-hidden bg-[#f4f7f3] text-(--color-primary)">
 
-            {signIn && <NewSignIn onClose={() => setSignIn(false)} />}
+            {signIn && <NewSignIn onClose={() => setSignIn(false)} onSignUp={() => { setSignIn(false); setSignUp(true); }} />}
+            {signUp && <NewSignUp onClose={() => setSignUp(false)} onSignIn={() => { setSignUp(false); setSignIn(true); }} />}
             
             <div className="relative mx-auto max-w-7xl px-6 pb-12 pt-5 sm:px-10 lg:px-14">
                 <div className="pointer-events-none absolute -right-32 -top-40 h-96 w-96 rounded-full bg-[#d9f2df] blur-3xl" />
@@ -48,8 +51,8 @@ const NewLanding = ()=>{
                             <button type="button" onClick={() => setSignIn((currentSignIn) => !currentSignIn)} className="rounded-full bg-(--color-primary) px-6 py-3 text-sm font-bold text-white shadow-[0_10px_24px_rgba(20,20,20,0.16)] transition-transform hover:-translate-y-0.5">
                                 Get started <span className="ml-2">-&gt;</span>
                             </button>
-                            <button type="button" className="rounded-full border border-[#cbd7ce] bg-white/70 px-6 py-3 text-sm font-bold text-(--color-primary) transition-colors hover:bg-white">
-                                See how it works
+                            <button type="button" onClick={() => setSignUp(true)} className="rounded-full border border-[#cbd7ce] bg-white/70 px-6 py-3 text-sm font-bold text-(--color-primary) transition-colors hover:bg-white">
+                                Sign up
                             </button>
                         </div>
                     </div>

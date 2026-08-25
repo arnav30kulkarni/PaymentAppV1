@@ -5,7 +5,7 @@ import Inputbox from "../components/Inputbox";
 import NewButton from "../components/NewButton";
 import Subheading from "../components/Subheading";
 
-const NewSignIn = ({ onClose }) => {
+const NewSignIn = ({ onClose, onSignUp }) => {
 
     return(
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
@@ -20,7 +20,7 @@ const NewSignIn = ({ onClose }) => {
                 <Inputbox label={"Username"} placeholder={"Username"}></Inputbox>
                 <Inputbox label={"Password"} placeholder={"Password"}></Inputbox>
                 <NewButton text={"Continue"}></NewButton>
-                <Bottomwarning text={"Don't have an account?"} linktext={"Sign Up Now"}></Bottomwarning>
+                <Bottomwarning text={"Don't have an account?"} linktext={"Sign Up Now"} onClick={onSignUp}></Bottomwarning>
             </div>
         </div>
     )

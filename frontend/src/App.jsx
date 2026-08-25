@@ -19,7 +19,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           //Landing
-          <Route path="/" element={<Suspense fallback="loading..."><Landing/></Suspense>}/>
+          <Route path="/" element={<Suspense fallback="loading..."><NewLanding/></Suspense>}/>
           <Route path="/new-landing" element={<Suspense fallback="loading..."><NewLanding/></Suspense>}/>
 
           //Redirection
