@@ -1,7 +1,20 @@
 @import "tailwindcss";
 
+html,
+body,
+#root {
+    min-height: 100%;
+    margin: 0;
+    background: var(--color-bg);
+}
+
+body {
+    color: var(--text-primary);
+    transition: background-color 180ms ease, color 180ms ease;
+}
+
 :root {
-    --color-bg: #b8b4b4;
+    --color-bg: #faf6f6;
     --color-bg-secondary: #FFFFFF;
     --color-primary: #141414;
     --color-accent: #38ba80;
@@ -32,4 +45,62 @@
     --color-negative: #ef4444;
     --color-warning: #f59e0b;
     --color-border: #3b4540;
+}
+
+.dashboard-page {
+    min-height: 100vh;
+    background: var(--color-bg);
+    color: var(--text-primary);
+    transition: background-color 180ms ease, color 180ms ease;
+}
+
+.dashboard-content {
+    width: min(100% - 2rem, 72rem);
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.balance-card {
+    width: 100%;
+    max-width: 52rem;
+    min-height: 13rem;
+    padding: 2.5rem 3rem;
+    border: 1px solid #252a27;
+    border-radius: 1rem;
+    background: #171a18;
+    color: #f5f7f6;
+    box-shadow: 0 1.25rem 2.5rem rgb(20 20 20 / 16%);
+}
+
+.balance-label {
+    margin: 0;
+    color: #a7afaa;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.balance-value {
+    margin: 1rem 0 0;
+    color: #ffffff;
+    font-size: clamp(2.75rem, 8vw, 4.75rem);
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.balance-error {
+    margin: 0.75rem 0 0;
+    color: #fca5a5;
+    font-size: 0.875rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --color-bg: #121614;
+        --color-bg-secondary: #1c211f;
+        --text-primary: #f5f7f6;
+        --text-secondary: #a7afaa;
+        --color-border: #3b4540;
+    }
 }
