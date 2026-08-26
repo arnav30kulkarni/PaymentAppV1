@@ -1,10 +1,10 @@
 const express=require("express");
-const jwt=require("jsonwebtoken");
-const secretkey=process.env.JWT_SECRET;
+const mongoose=require("mongoose");
+const { randomUUID } = require("crypto");
 const { authMiddleware } = require("../middlware/authMiddleware");
 const { Account }=require("../config/bankschema");
+const { Transaction } = require("../config/userschema");
 const zod=require("zod");
-const { User } = require("../config/userschema");
 
 const router= express.Router();
 
@@ -19,50 +19,94 @@ router.get("/balance",authMiddleware,async(req,res)=>{
 })
 
 router.post("/transfer", authMiddleware, async (req, res) => {
-    const session = await Account.startSession();
-    session.startTransaction(); 
-
     try {
-        const { amount, to } = req.body;
+        const parsedBody = zod.object({
+            to: zod.string().refine((value) => mongoose.Types.ObjectId.isValid(value)),
+            amount: zod.coerce.number().finite().positive(),
+        }).safeParse(req.body);
 
-        const account = await Account.findOne({ userId: req.userId }).session(session);
-
-        if (!account || account.balance < amount) {
-            await session.abortTransaction();
-            session.endSession();
-            return res.status(400).json({ msg: "Insufficient Balance" });
+        if (!parsedBody.success) {
+            return res.status(400).json({ msg: "Enter a valid recipient and amount" });
         }
 
-        const toAccount = await Account.findOne({ userId: to }).session(session);
+        const { amount, to } = parsedBody.data;
 
-        if (!toAccount) {
-            await session.abortTransaction();
-            session.endSession();
+        if (String(req.userId) === to) {
+            return res.status(400).json({ msg: "You cannot transfer money to yourself" });
+        }
+
+        const recipient = await Account.findOne({ userId: to });
+
+        if (!recipient) {
             return res.status(404).json({ msg: "The recipient account does not exist" });
         }
 
-        
-        await Account.updateOne(
-            { userId: req.userId },
-            { $inc: { balance: -amount } } 
-        ).session(session);
+        const account = await Account.findOneAndUpdate(
+            { userId: req.userId, balance: { $gte: amount } },
+            { $inc: { balance: -amount } },
+            { new: true }
+        );
 
-        
-        await Account.updateOne(
-            { userId: to },
-            { $inc: { balance: amount } } 
-        ).session(session);
+        if (!account) {
+            return res.status(400).json({ msg: "Insufficient Balance" });
+        }
 
-        
-        await session.commitTransaction();
-        session.endSession();
+        try {
+            const updatedRecipient = await Account.findOneAndUpdate(
+                { userId: to },
+                { $inc: { balance: amount } },
+                { new: true }
+            );
 
-        res.json({ msg: "Transfer successful!" });
+            if (!updatedRecipient) {
+                throw new Error("Recipient account disappeared during transfer");
+            }
+
+            recipient.balance = updatedRecipient.balance;
+        } catch (error) {
+            await Account.updateOne(
+                { userId: req.userId },
+                { $inc: { balance: amount } }
+            );
+            throw error;
+        }
+
+        const transferId = randomUUID();
+        try {
+            await Transaction.insertMany([
+                {
+                    userId: req.userId,
+                    type: "Debit",
+                    amount,
+                    balance: account.balance,
+                    counterpartyId: to,
+                    transferId,
+                },
+                {
+                    userId: to,
+                    type: "Credit",
+                    amount,
+                    balance: recipient.balance + amount,
+                    counterpartyId: req.userId,
+                    transferId,
+                },
+            ]);
+        } catch (error) {
+            await Account.updateOne(
+                { userId: req.userId },
+                { $inc: { balance: amount } }
+            );
+            await Account.updateOne(
+                { userId: to },
+                { $inc: { balance: -amount } }
+            );
+            throw error;
+        }
+
+        res.json({ msg: "Transfer successful!", amount, to });
 
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
-        console.error(error);
+        console.error("Transfer error:", error);
         res.status(500).json({ msg: "Server error" });
     }
 });

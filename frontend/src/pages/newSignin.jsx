@@ -37,7 +37,7 @@ const NewSignIn = ({ onClose, onSignUp }) => {
                         setUsername(e.target.value);
                     }
                 }></Inputbox>
-                <Inputbox label={"Password"} placeholder={"Password"} onChange={
+                <Inputbox type="password" label={"Password"} placeholder={"Password"} onChange={
                     (e)=>{
                         setPassword(e.target.value);
                     }

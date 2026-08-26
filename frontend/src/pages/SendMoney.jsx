@@ -63,7 +63,7 @@ const SendMoney = () => {
       setPopUpMessage("Payment completed Successfully!");
     } catch (error) {
       setPopUpStatus("Failed ❌");
-      setPopUpMessage(error?.response?.data?.message || "Transfer failed");
+      setPopUpMessage(error?.response?.data?.msg || "Transfer failed");
     } finally {
       setLoading(false);
     }

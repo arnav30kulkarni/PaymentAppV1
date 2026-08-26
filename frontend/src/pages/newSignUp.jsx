@@ -6,7 +6,6 @@ import Inputbox from "../components/Inputbox";
 import NewButton from "../components/NewButton";
 import Subheading from "../components/Subheading";
 import { useNavigate } from "react-router-dom";
-import useDebounce from "../hooks/useDebounce";
 import axios from "axios";
 
 const NewSignUp = ({ onClose, onSignIn }) => {
@@ -23,6 +22,38 @@ const NewSignUp = ({ onClose, onSignIn }) => {
             navigate("/my")
         }
     },[token,navigate])
+
+    const handleSignup = async () => {
+        if (!firstName || !lastname || !username || !password) {
+            setErrorMessage("All fields are required.");
+            return;
+        }
+
+        if (!/^\S+@\S+\.\S+$/.test(username)) {
+            setErrorMessage("Username must be a valid email address.");
+            return;
+        }
+
+        if (password.length < 6) {
+            setErrorMessage("Password must be at least 6 characters.");
+            return;
+        }
+
+        try {
+            const response = await axios.post("http://localhost:4500/api/v1/user/signup", {
+                firstname: firstName,
+                lastname,
+                username,
+                password
+            });
+
+            localStorage.setItem("token", response.data.token);
+            navigate("/dashboard");
+        } catch (err) {
+            console.error(err);
+            setErrorMessage(err.response?.data?.msg || "Could not sign up. Please try again.");
+        }
+    };
 
     return(
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
@@ -49,29 +80,12 @@ const NewSignUp = ({ onClose, onSignIn }) => {
                         setUsername(e.target.value);
                     }
                 }></Inputbox>
-                <Inputbox label={"Password"} placeholder={"Password"} onChange={
+                <Inputbox type="password" label={"Password"} placeholder={"Password"} onChange={
                     (e)=>{
                         setPassword(e.target.value);
                     }
                 }></Inputbox>
-                <NewButton text={"Continue"} onClick={
-                    ()=>{
-                        axios.post("http://localhost:3000/api/v1/users/signup", {
-                            firstName,
-                            lastname,
-                            username,
-                            password
-                        })
-                        .then((res)=>{
-                            localStorage.setItem("token",res.data.token);
-                            navigate("/dashboard")
-                        })
-                        .catch((err)=>{
-                            console.error(err);
-                            setErrorMessage("Could Not Sign Up, Please Try Again!")
-                        })
-                    }
-                }></NewButton>
+                <NewButton text={"Continue"} onClick={handleSignup}></NewButton>
                 <h1 className="text-(--color-negative) font-bold text-lg text-center">{errormessage}</h1>
                 <Bottomwarning text={"Already Have an Account?"} linktext={"LogIn"} onClick={onSignIn}></Bottomwarning>
             </div>
