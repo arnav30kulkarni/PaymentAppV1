@@ -1,105 +1,245 @@
-# 💳 Full Stack Payment Application
+# PayFlow Demo
 
-A simple full-stack payment application where users can authenticate, search other users, and send money securely.
+PayFlow is a full-stack payment simulation app built with React, Express, and MongoDB. It is designed as a modern wallet and transfer demo where users can sign up, configure a payment PIN, view balances, search contacts, and simulate transfers in a secure frontend flow.
 
----
-
-## 🚀 Features
-
-- 🔐 User Authentication (Signup / Signin)
-- 🪪 JWT-based Token Management
-- 🔒 Protected Routes
-- 📊 Dashboard with User Search (by first name / last name)
-- 👤 Profile Popup with Update Information Page
-- 💸 Send Money Between Users
-- 💰 Fetch & Display Current Balance
-- 🚪 Logout Functionality
+This project is a demo/prototype intended for learning, UI exploration, and local development. It is not a production financial platform.
 
 ---
 
-## 🛠 Tech Stack
+## Overview
+
+- Secure user signup and sign-in flow
+- JWT-based authenticated API access
+- Dashboard with wallet balance and recent activity
+- Search and pay experience for users
+- Profile page with editable account details
+- Payment PIN setup for transfer authorization
+- Notification panel driven from recent transaction data
+- Responsive UI with a refreshed dashboard and landing page
+
+---
+
+## Tech Stack
 
 ### Frontend
-- React
-- React Router DOM
-- TailwindCSS
-- Axios
+- React 19
 - Vite
+- React Router DOM
+- Axios
+- Tailwind CSS
 
 ### Backend
+- Node.js
 - Express 5
-- MongoDB
-- Mongoose
-- JSON Web Token (JWT)
-- Zod (Validation)
+- MongoDB + Mongoose
+- JWT
+- bcryptjs
+- Zod validation
+- dotenv
 - CORS
-- Dotenv
 
 ---
 
-## 🏗 Project Structure
+## Project Structure
 
-> /frontend
-
-> /backend
-
-
-- `frontend` → React application (UI + Routing + API calls)
-- `backend` → Express server (Auth, APIs, DB logic)
-
----
-
-## 🔐 Authentication Flow
-
-1. User signs up / signs in
-2. Backend generates JWT token
-3. Token is stored on frontend
-4. Protected routes verify token before granting access
-
----
-
-## ⚙️ Installation & Setup
-
-### 1️⃣ Clone the repository
-
-```bash
-git clone <your-repo-link>
-cd <project-folder>
+```text
+PaytmfromCohort/
+├── backend/
+│   ├── config/
+│   ├── middlware/
+│   ├── routes/
+│   ├── .env.example
+│   ├── package.json
+│   └── server.js
+├── frontend/
+│   ├── src/
+│   ├── package.json
+│   ├── vite.config.js
+│   └── index.html
+├── README.md
+├── CONTRIBUTING.md
+├── .env.example
+└── .gitignore
 ```
 
-### 2️⃣ Backend Setup
+---
+
+## Required Software
+
+Before starting, make sure you have:
+
+- Node.js 18+ and npm
+- Docker Desktop or Docker Engine
+- Git
+
+---
+
+## Local Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repo-url>
+cd PaytmfromCohort
+```
+
+### 2. Install dependencies
+
+Backend:
+
 ```bash
 cd backend
 npm install
 ```
 
-> Create a .env file
-
-PORT=4500,
-
-MONGO_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_secret_key
-
->Run backend:
+Frontend:
 
 ```bash
-npm run dev
-```
-
-### 3️⃣ Frontend Setup
-
-```bash 
-cd frontend
+cd ../frontend
 npm install
+```
+
+### 3. Start MongoDB with Docker
+
+If you do not already have a Mongo container running:
+
+```bash
+docker run -d --name mongo -p 27017:27017 mongo:latest
+```
+
+If it already exists:
+
+```bash
+docker start mongo
+```
+
+Confirm the database is listening:
+
+```bash
+docker ps --filter "name=^/mongo$"
+```
+
+### 4. Create environment variables
+
+Copy the example environment file for the backend:
+
+Windows:
+
+```powershell
+copy .env.example backend\.env
+```
+
+Linux/macOS:
+
+```bash
+cp .env.example backend/.env
+```
+
+Example contents:
+
+```env
+PORT=4500
+MONGO_URI=mongodb://localhost:27017/payflow
+JWT_SECRET=your_super_secret_key_here
+```
+
+If you want to keep the app config in a project-level env file, use the root `.env.example` as a template and copy it where needed for your local environment.
+
+---
+
+## Run the application
+
+### Start the backend
+
+```bash
+cd backend
 npm run dev
 ```
 
-## 🔮 Future Improvements
+The API should start on:
 
-- Transaction history
-- Improved UI/UX
-- Role-based access
-- Payment gateway integration
+```text
+http://localhost:4500
+```
+
+### Start the frontend
+
+```bash
+cd ../frontend
+npm run dev 
+```
+
+The app should open in the browser at:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## Route / Navigation Index
+
+The app uses client-side navigation via React Router.
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Landing page |
+| `/new-landing` | Landing page alias |
+| `/newdashboard` | Main dashboard with balance and recent activity |
+| `/users` | Search and view users to pay |
+| `/send` | Payment flow and transfer page |
+| `/profile` | User profile and settings |
+
+### User flow
+
+1. Open the landing page.
+2. Sign up or sign in.
+3. Complete the initial dashboard flow.
+4. View wallet balance and recent activity.
+5. Search recipients from `/users` and proceed to `/send`.
+6. Update profile settings from `/profile`.
+
+---
+
+## Important Notes
+
+- The app is a simulation/demo project.
+- Payment and wallet behavior are intentionally local and demo-driven.
+- Store secrets in environment variables and never commit real `.env` files.
+- The backend expects a JWT secret and a MongoDB connection string.
+
+---
+
+## Build Verification
+
+To validate the frontend build locally:
+
+```bash
+cd frontend
+npm run build
+```
+
+To validate the backend syntax quickly:
+
+```bash
+cd backend
+node --check server.js
+```
+
+---
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before making changes.
+
+---
+
+## Future Improvements
+
+- Add real payment gateway integration
+- Improve transaction analytics and filtering
+- Add unit and integration tests
+- Expand profile and KYC controls
+- Add stronger production security policies
 
 ---
