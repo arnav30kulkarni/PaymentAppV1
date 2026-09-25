@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Bottomwarning from "../components/Bottomwarning";
 import "../components/Heading";
 import Heading from "../components/Heading";
@@ -6,21 +6,13 @@ import Inputbox from "../components/Inputbox";
 import NewButton from "../components/NewButton";
 import Subheading from "../components/Subheading";
 import { useNavigate } from "react-router-dom";
-import useDebounce from "../hooks/useDebounce";
 import axios from "axios";
 
 const NewSignIn = ({ onClose, onSignUp }) => {
-    const token = localStorage.getItem("token");
     const [username,setUsername] = useState("");
     const [password,setPassword] = useState("");
     const [errormessage,setErrorMessage] = useState("");
     const navigate = useNavigate();
-
-    useEffect(()=>{
-        if(token){
-            navigate("/my")
-        }
-    },[token,navigate])
 
     return(
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
@@ -50,7 +42,7 @@ const NewSignIn = ({ onClose, onSignUp }) => {
                         })
                         .then((res)=>{
                             localStorage.setItem("token",res.data.token);
-                            navigate("/dashboard")
+                            navigate("/newdashboard")
                         })
                         .catch((err)=>{
                             console.error(err);

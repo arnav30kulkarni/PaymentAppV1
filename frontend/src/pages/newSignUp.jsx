@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Bottomwarning from "../components/Bottomwarning";
 import "../components/Heading";
 import Heading from "../components/Heading";
@@ -9,19 +9,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const NewSignUp = ({ onClose, onSignIn }) => {
-    const token = localStorage.getItem("token");
     const [firstName,setFirstName] = useState("");
     const [lastname,setLastName] = useState("");
     const [username,setUsername] = useState("");
     const [password,setPassword] = useState("");
     const [errormessage , setErrorMessage] = useState("");
     const navigate = useNavigate();
-
-    useEffect(()=>{
-        if(token){
-            navigate("/my")
-        }
-    },[token,navigate])
 
     const handleSignup = async () => {
         if (!firstName || !lastname || !username || !password) {
@@ -48,7 +41,7 @@ const NewSignUp = ({ onClose, onSignIn }) => {
             });
 
             localStorage.setItem("token", response.data.token);
-            navigate("/dashboard");
+            navigate("/newdashboard");
         } catch (err) {
             console.error(err);
             setErrorMessage(err.response?.data?.msg || "Could not sign up. Please try again.");

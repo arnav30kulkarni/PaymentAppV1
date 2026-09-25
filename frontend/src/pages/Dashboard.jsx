@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import Appbar from "../components/AppBar";
-import Balance from "../components/Balance";
+import NewAppbar from "../components/NewAppbar";
 import Users from "../components/Users";
 import axios from "axios";
 import { useState } from "react";
@@ -15,7 +14,7 @@ const Dashboard=()=>{
 
     useEffect(()=>{
         if(!token){
-            navigate("/my")
+            navigate("/")
         }
     },[token,navigate])
 
@@ -34,17 +33,21 @@ const Dashboard=()=>{
             })
     })
     return(
-        <>
-        <div className="flex-col justify-center mt-8 mr-4 ml-4 shadow">
-            <Appbar/>
-        </div>
-        <div className="flex-col justify-center text-left">
-            <Balance value={balance}></Balance>
-        </div>
-        <div>
-            <Users></Users>
-        </div>
-        </>
+        <main className="users-page">
+            <NewAppbar />
+            <section className="users-shell">
+                <button type="button" className="users-back" onClick={() => navigate("/newdashboard")}>← Back to dashboard</button>
+                <div className="users-hero">
+                    <div>
+                        <p className="dashboard-eyebrow">Pay someone</p>
+                        <h1>Choose a recipient.</h1>
+                        <p>Search your PayFlow contacts and start a secure transfer in seconds.</p>
+                    </div>
+                    <div className="users-balance-pill"><span>Available balance</span><strong>{balance ? `₹${Number(balance).toFixed(2)}` : "Loading..."}</strong></div>
+                </div>
+                <Users />
+            </section>
+        </main>
     )
 }
 

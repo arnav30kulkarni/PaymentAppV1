@@ -25,9 +25,14 @@ const NewLanding = ()=>{
                             <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-(--text-secondary)">Move freely</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 rounded-full border border-[#cce6d4] bg-white/80 px-3 py-1.5 text-xs font-semibold text-(--text-accent-hover) shadow-sm">
-                        <span className="h-2 w-2 rounded-full bg-(--color-positive) shadow-[0_0_0_3px_#d9f2df]" />
-                        v2 live
+                    <div className="flex items-center gap-2">
+                        <div className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700 shadow-sm">
+                            Simulation demo
+                        </div>
+                        <div className="flex items-center gap-2 rounded-full border border-[#cce6d4] bg-white/80 px-3 py-1.5 text-xs font-semibold text-(--text-accent-hover) shadow-sm">
+                            <span className="h-2 w-2 rounded-full bg-(--color-positive) shadow-[0_0_0_3px_#d9f2df]" />
+                            v2 live
+                        </div>
                     </div>
                 </header>
 

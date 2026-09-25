@@ -31,29 +31,30 @@ const Users = () => {
         console.error("Error fetching users:", err);
         setUsers([]);
       });
-  }, [debouncedFilter]);
+  }, [debouncedFilter, token]);
 
   return (
-    <div className="flex flex-col ml-4 mr-4 px-2 py-2">
-      <div className="text-black mt-4 text-xl font-bold">
-        Users:
+    <div className="users-directory">
+      <div className="users-directory-heading">
+        <div><h2>People</h2><span>{users.length} available {users.length === 1 ? "recipient" : "recipients"}</span></div>
+        <span className="users-secure-mark">● Secure directory</span>
       </div>
-
-      <div className="flex flex-col text-black mt-4">
+      <div className="users-search-wrap">
+        <span aria-hidden="true">⌕</span>
         <input
           onChange={(e) => setFilter(e.target.value)}
-          className="px-2 py-3 border rounded border-b-slate-200 shadow w-full"
-          placeholder="Search..."
+          className="users-search"
+          placeholder="Search by first or last name"
         />
       </div>
 
-      <div>
+      <div className="users-list">
         {users.length > 0 ? (
           users.map((user) => (
             <User key={user.id || user._id} user={user} />
           ))
         ) : (
-          <div className="mt-4 text-gray-500">No users found</div>
+          <div className="users-empty"><strong>No recipients found</strong><span>Try a different name or clear your search.</span></div>
         )}
       </div>
     </div>
@@ -68,24 +69,17 @@ function User({ user }) {
   const initial = firstName ? firstName[0].toUpperCase() : "?";
 
   return (
-    <div className="flex justify-between mt-2">
-      <div className="flex">
-        <div
-          className={`rounded-full h-12 w-12 ${user.color} flex justify-center items-center mr-2`}
-        >
-          <div className="text-xl text-white">
-            {initial}
-          </div>
+    <div className="user-row">
+      <div className="user-identity">
+        <div className={`user-avatar ${user.color}`}>
+          {user.profilePicture ? <img src={user.profilePicture} alt={`${firstName} ${lastName}`} /> : <div>{initial}</div>}
         </div>
-
-        <div className="pl-2 flex flex-col justify-center">
-          <div className="font-bold text-lg px-1">
-            {firstName} {lastName}
-          </div>
+        <div className="user-copy">
+          <strong>{firstName} {lastName}</strong>
+          <span>{user.username}</span>
         </div>
       </div>
-
-      <div className="flex flex-col justify-center">
+      <div>
         <Button
           onClick={() => {
             navigate(
@@ -97,7 +91,7 @@ function User({ user }) {
                 lastName
             );
           }}
-          text="Send Money"
+          text="Pay"
         />
       </div>
     </div>

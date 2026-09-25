@@ -4,20 +4,23 @@ const TransferPopup = ({ open, currStatus, message, onClose, onBack }) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-63 flex flex-col">
-        <div className="text-2xl font-bold text-center">{currStatus}</div>
-        <div className="text-lg text-center mt-3">{message}</div>
-        <div className="flex gap-2 mt-6">
+    <div className="payment-modal-backdrop">
+      <div className="payment-modal" role="dialog" aria-modal="true" aria-labelledby="payment-status">
+        <div className={`payment-status-icon ${currStatus.startsWith("Success") ? "success" : currStatus.startsWith("Failed") ? "failed" : "processing"}`}>
+          {currStatus.startsWith("Success") ? "✓" : currStatus.startsWith("Failed") ? "!" : "· · ·"}
+        </div>
+        <div id="payment-status" className="payment-modal-title">{currStatus}</div>
+        <div className="payment-modal-message">{message}</div>
+        <div className="payment-modal-actions">
           <button
             onClick={onBack}
-            className="w-full bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+            className="payment-modal-primary"
           >
             OK
           </button>
           <button
             onClick={onClose}
-            className="w-full bg-gray-800 text-white px-5 py-2 rounded-lg hover:bg-gray-900"
+            className="payment-modal-secondary"
           >
             Try Again
           </button>
