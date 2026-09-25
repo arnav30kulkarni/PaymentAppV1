@@ -3,7 +3,8 @@ const mongoose=require("mongoose");
 const { randomUUID } = require("crypto");
 const { authMiddleware } = require("../middlware/authMiddleware");
 const { Account }=require("../config/bankschema");
-const { Transaction } = require("../config/userschema");
+const { Transaction, User } = require("../config/userschema");
+const bcrypt = require("bcryptjs");
 const zod=require("zod");
 
 const router= express.Router();
@@ -18,18 +19,58 @@ router.get("/balance",authMiddleware,async(req,res)=>{
     })
 })
 
+router.get("/recent", authMiddleware, async (req, res) => {
+    try {
+        const transactions = await Transaction.find({ userId: req.userId })
+            .sort({ createdAt: -1 })
+            .limit(6)
+            .lean();
+
+        const counterpartyIds = transactions.map((transaction) => transaction.counterpartyId);
+        const users = await User.find({ _id: { $in: counterpartyIds } })
+            .select("firstname lastname username")
+            .lean();
+        const usersById = new Map(users.map((user) => [String(user._id), user]));
+
+        res.json({
+            transactions: transactions.map((transaction) => ({
+                id: transaction._id,
+                type: transaction.type,
+                amount: transaction.amount,
+                balance: transaction.balance,
+                createdAt: transaction.createdAt,
+                counterparty: usersById.get(String(transaction.counterpartyId)) || null,
+            })),
+        });
+    } catch (error) {
+        console.error("Recent transactions error:", error);
+        res.status(500).json({ msg: "Unable to load recent transactions" });
+    }
+});
+
 router.post("/transfer", authMiddleware, async (req, res) => {
     try {
         const parsedBody = zod.object({
             to: zod.string().refine((value) => mongoose.Types.ObjectId.isValid(value)),
             amount: zod.coerce.number().finite().positive(),
+            pin: zod.string().regex(/^\d{4,6}$/),
         }).safeParse(req.body);
 
         if (!parsedBody.success) {
             return res.status(400).json({ msg: "Enter a valid recipient and amount" });
         }
 
-        const { amount, to } = parsedBody.data;
+        const { amount, to, pin } = parsedBody.data;
+
+        const user = await User.findById(req.userId).select("paymentPin");
+        if (!user || !user.paymentPin) {
+            return res.status(403).json({ msg: "Payment PIN setup is required" });
+        }
+
+        const pinMatches = await bcrypt.compare(pin, user.paymentPin);
+        if (!pinMatches) {
+            return res.status(401).json({ msg: "Incorrect payment PIN" });
+        }
 
         if (String(req.userId) === to) {
             return res.status(400).json({ msg: "You cannot transfer money to yourself" });

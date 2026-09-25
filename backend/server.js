@@ -13,7 +13,7 @@ const PORT=process.env.PORT || 3000;
 app.use(cors({
     origin:"http://localhost:5173"
 }));
-app.use(express.json());
+app.use(express.json({ limit: "3mb" }));
 app.use("/api/v1",mainRouter);
 
 //mongoDB connection

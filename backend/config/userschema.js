@@ -18,6 +18,14 @@ const userSchema= new mongoose.Schema({
         type:String,
         required:true,
         minlength:6
+    },
+    paymentPin:{
+        type:String,
+        default:""
+    },
+    profilePicture:{
+        type:String,
+        default:""
     }
 })
 
