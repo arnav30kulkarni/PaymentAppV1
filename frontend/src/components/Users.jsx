@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
@@ -13,8 +13,8 @@ const Users = () => {
   const debouncedFilter = useDebounce(filter, 400);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:4500/api/v1/user/bulk?filter=" + debouncedFilter,{
+    api
+      .get("/api/v1/user/bulk?filter=" + debouncedFilter,{
         headers:{
           Authorization:`Bearer ${token}`
         }

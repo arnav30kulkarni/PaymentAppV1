@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api";
 
 const PinSetupPopup = ({ onConfigured }) => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -19,7 +19,7 @@ const PinSetupPopup = ({ onConfigured }) => {
 
     try {
       setSaving(true);
-      await axios.put("http://localhost:4500/api/v1/user/pin", {
+      await api.put("/api/v1/user/pin", {
         currentPassword,
         pin,
       }, {

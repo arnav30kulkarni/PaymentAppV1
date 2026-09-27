@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { useEffect, useState } from "react";
 import TransferPopup from "./TransferPopUp";
 import NewAppbar from "../components/NewAppbar";
@@ -39,7 +39,7 @@ const SendMoney = () => {
   }, [id, name, navigate])
 
   useEffect(() => {
-    axios.get(`http://localhost:4500/api/v1/user/recipient/${id}`, {
+    api.get(`/api/v1/user/recipient/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => setRecipient(response.data))
@@ -47,7 +47,7 @@ const SendMoney = () => {
   }, [id, token]);
 
   useEffect(() => {
-    axios.get("http://localhost:4500/api/v1/account/balance", {
+    api.get("/api/v1/account/balance", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => setBalance(Number(response.data.balance)))
@@ -86,8 +86,8 @@ const SendMoney = () => {
       setPopUpMessage("Please wait while your transfer is being completed...");
       setPopUpOpen(true);
 
-      await axios.post(
-        "http://localhost:4500/api/v1/account/transfer",
+      await api.post(
+        "/api/v1/account/transfer",
         { to: id, amount: Number(amount), pin },
         {
           headers: {

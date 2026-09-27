@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import LogoutButton from "./LogoutButton";
 
 const NewAppbar = () => {
@@ -24,7 +24,7 @@ const NewAppbar = () => {
         }
 
         try {
-            const response = await axios.get("http://localhost:4500/api/v1/account/recent", {
+            const response = await api.get("/api/v1/account/recent", {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setNotifications(response.data.transactions || []);
@@ -39,7 +39,7 @@ const NewAppbar = () => {
 
         const loadDashboardData = async () => {
             try {
-                const userResponse = await axios.get("http://localhost:4500/api/v1/user/me", {
+                const userResponse = await api.get("/api/v1/user/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setUser(userResponse.data);

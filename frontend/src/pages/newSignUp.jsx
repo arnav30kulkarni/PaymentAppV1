@@ -6,7 +6,7 @@ import Inputbox from "../components/Inputbox";
 import NewButton from "../components/NewButton";
 import Subheading from "../components/Subheading";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 
 const NewSignUp = ({ onClose, onSignIn }) => {
     const [firstName,setFirstName] = useState("");
@@ -33,7 +33,7 @@ const NewSignUp = ({ onClose, onSignIn }) => {
         }
 
         try {
-            const response = await axios.post("http://localhost:4500/api/v1/user/signup", {
+            const response = await api.post("/api/v1/user/signup", {
                 firstname: firstName,
                 lastname,
                 username,

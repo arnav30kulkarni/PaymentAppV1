@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import NewAppbar from "../components/NewAppbar";
 import Users from "../components/Users";
-import axios from "axios";
+import api from "../api";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -20,7 +20,7 @@ const Dashboard=()=>{
 
     const[balance,setBalance]=useState(0);
     useEffect(()=>{
-        axios.get("http://localhost:4500/api/v1/account/balance",{
+        api.get("/api/v1/account/balance",{
             headers:{
                 Authorization:"Bearer "+token
             }
