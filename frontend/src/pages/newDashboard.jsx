@@ -1,5 +1,5 @@
 import NewAppbar from "../components/NewAppbar";
-import axios from "axios";
+import api from "../api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PinSetupPopup from "../components/PinSetupPopup";
@@ -21,7 +21,7 @@ const NewDashboard = () => {
             },
         };
 
-        axios.get("http://localhost:4500/api/v1/account/balance", requestConfig)
+        api.get("/api/v1/account/balance", requestConfig)
             .then((response) => setBalance(response.data.balance))
             .catch((error) => {
                 if ([401, 403].includes(error.response?.status)) {
@@ -32,7 +32,7 @@ const NewDashboard = () => {
                 setErrorMessage(error.response?.data?.msg || "Unable to load balance");
             });
 
-        axios.get("http://localhost:4500/api/v1/user/me", requestConfig)
+        api.get("/api/v1/user/me", requestConfig)
             .then((response) => setPinSetupRequired(!response.data.pinConfigured))
             .catch((error) => {
                 if ([401, 403].includes(error.response?.status)) {
@@ -41,7 +41,7 @@ const NewDashboard = () => {
                 }
             });
 
-        axios.get("http://localhost:4500/api/v1/account/recent", requestConfig)
+        api.get("/api/v1/account/recent", requestConfig)
             .then((response) => setTransactions(response.data.transactions || []))
             .catch((error) => console.error("Error fetching transactions:", error))
             .finally(() => setTransactionsLoading(false));

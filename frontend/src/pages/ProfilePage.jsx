@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { Navigate, useNavigate } from "react-router-dom";
 
 const Profile = () => {
@@ -20,8 +20,8 @@ const Profile = () => {
   useEffect(() => {
     if (!token) return;
 
-    axios
-      .get("http://localhost:4500/api/v1/user/me", {
+    api
+      .get("/api/v1/user/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -68,7 +68,7 @@ const Profile = () => {
     }
 
     try {
-      await axios.put("http://localhost:4500/api/v1/user", updateData, {
+      await api.put("/api/v1/user", updateData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser({ ...user, firstname: form.firstname.trim(), lastname: form.lastname.trim() });
@@ -85,7 +85,7 @@ const Profile = () => {
     setError("");
 
     try {
-      await axios.put("http://localhost:4500/api/v1/user/pin", pinForm, {
+      await api.put("/api/v1/user/pin", pinForm, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPinForm({ currentPassword: "", pin: "" });
@@ -107,7 +107,7 @@ const Profile = () => {
     const reader = new FileReader();
     reader.onload = async () => {
       try {
-        const response = await axios.put("http://localhost:4500/api/v1/user/profile-picture", {
+        const response = await api.put("/api/v1/user/profile-picture", {
           profilePicture: reader.result,
         }, {
           headers: { Authorization: `Bearer ${token}` },

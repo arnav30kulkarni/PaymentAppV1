@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+CONTRIBUTING.md
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Production builds (unless you need them in the container)
+dist/
+build/
+*.tgz
+
+# Docker files
+Dockerfile
+.dockerignore
+

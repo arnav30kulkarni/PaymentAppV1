@@ -1,0 +1,569 @@
+openapi: 3.1.0
+info:
+  title: PayFlow API
+  version: 1.0.0
+  description: API for the PayFlow payment simulation app. Transfers and balances are demo-only.
+servers:
+  - url: http://localhost:4500
+    description: Local development server
+
+tags:
+  - name: Users
+  - name: Accounts
+
+paths:
+  /api/v1/user/signup:
+    post:
+      tags: [Users]
+      summary: Create an account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '200':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input or username already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/user/signin:
+    post:
+      tags: [Users]
+      summary: Sign in
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SigninRequest'
+      responses:
+        '200':
+          description: Sign-in successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '403':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '404':
+          description: User not found or password incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/user/me:
+    get:
+      tags: [Users]
+      summary: Get the authenticated user's profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user's profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/v1/user:
+    put:
+      tags: [Users]
+      summary: Update profile details or password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: No fields to update or current password required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Current password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '403':
+          description: Invalid input or token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/user/pin:
+    put:
+      tags: [Users]
+      summary: Set or update the payment PIN
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PinSetupRequest'
+      responses:
+        '200':
+          description: Payment PIN configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid password or PIN format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Current password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/user/profile-picture:
+    put:
+      tags: [Users]
+      summary: Update the profile picture
+      description: Accepts a base64-encoded PNG, JPEG, JPG, or WebP data URL.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfilePictureRequest'
+      responses:
+        '200':
+          description: Profile picture updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [msg, profilePicture]
+                properties:
+                  msg:
+                    type: string
+                  profilePicture:
+                    type: string
+        '400':
+          description: Unsupported or invalid image data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/user/bulk:
+    get:
+      tags: [Users]
+      summary: Search for other users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Case-insensitive search against first and last names.
+      responses:
+        '200':
+          description: Matching users, excluding the authenticated user
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [users]
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recipient'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/user/recipient/{id}:
+    get:
+      tags: [Users]
+      summary: Get a recipient's public profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: MongoDB user identifier.
+      responses:
+        '200':
+          description: Recipient profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipient'
+        '400':
+          description: Invalid recipient identifier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '404':
+          description: Recipient not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/account/balance:
+    get:
+      tags: [Accounts]
+      summary: Get the authenticated user's wallet balance
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current simulated balance
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [balance]
+                properties:
+                  balance:
+                    type: number
+                    example: 2450.75
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+
+  /api/v1/account/recent:
+    get:
+      tags: [Accounts]
+      summary: Get up to six recent transactions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Recent transactions, newest first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [transactions]
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Unable to load recent transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/v1/account/transfer:
+    post:
+      tags: [Accounts]
+      summary: Transfer simulated funds to another user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '200':
+          description: Transfer completed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [msg, amount, to]
+                properties:
+                  msg:
+                    type: string
+                    example: Transfer successful!
+                  amount:
+                    type: number
+                  to:
+                    type: string
+        '400':
+          description: Invalid transfer, self-transfer, or insufficient balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Invalid token or payment PIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '403':
+          description: Payment PIN setup is required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '404':
+          description: Recipient account does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Missing or malformed bearer authorization header
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageResponse'
+    InvalidToken:
+      description: Invalid or expired bearer token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageResponse'
+    ServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageResponse'
+
+  schemas:
+    SignupRequest:
+      type: object
+      required: [firstname, lastname, username, password]
+      properties:
+        firstname:
+          type: string
+          minLength: 1
+        lastname:
+          type: string
+          minLength: 1
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+
+    SigninRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+
+    AuthResponse:
+      type: object
+      required: [msg, token]
+      properties:
+        msg:
+          type: string
+        token:
+          type: string
+          description: JWT bearer token, valid for seven days.
+
+    ProfileUpdateRequest:
+      type: object
+      properties:
+        firstname:
+          type: string
+          minLength: 1
+        lastname:
+          type: string
+          minLength: 1
+        currentPassword:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 6
+      minProperties: 1
+
+    PinSetupRequest:
+      type: object
+      required: [currentPassword, pin]
+      properties:
+        currentPassword:
+          type: string
+          minLength: 1
+        pin:
+          type: string
+          pattern: '^[0-9]{4,6}$'
+
+    ProfilePictureRequest:
+      type: object
+      required: [profilePicture]
+      properties:
+        profilePicture:
+          type: string
+          maxLength: 3000000
+          pattern: '^data:image/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=]+$'
+
+    TransferRequest:
+      type: object
+      required: [to, amount, pin]
+      properties:
+        to:
+          type: string
+          description: MongoDB user identifier of the recipient.
+        amount:
+          type: number
+          exclusiveMinimum: 0
+        pin:
+          type: string
+          pattern: '^[0-9]{4,6}$'
+
+    CurrentUser:
+      type: object
+      required: [firstname, lastname, username, id, pinConfigured, profilePicture]
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: string
+        username:
+          type: string
+          format: email
+        id:
+          type: string
+        pinConfigured:
+          type: boolean
+        profilePicture:
+          type: string
+
+    Recipient:
+      type: object
+      required: [id, firstname, lastname, username, profilePicture]
+      properties:
+        id:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        username:
+          type: string
+          format: email
+        profilePicture:
+          type: string
+
+    Transaction:
+      type: object
+      required: [id, type, amount, balance, createdAt, counterparty]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [Credit, Debit]
+        amount:
+          type: number
+        balance:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        counterparty:
+          oneOf:
+            - $ref: '#/components/schemas/TransactionCounterparty'
+            - type: 'null'
+
+    TransactionCounterparty:
+      type: object
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: string
+        username:
+          type: string
+
+    MessageResponse:
+      type: object
+      required: [msg]
+      properties:
+        msg:
+          type: string

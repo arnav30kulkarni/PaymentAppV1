@@ -6,7 +6,7 @@ import Inputbox from "../components/Inputbox";
 import NewButton from "../components/NewButton";
 import Subheading from "../components/Subheading";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 
 const NewSignIn = ({ onClose, onSignUp }) => {
     const [username,setUsername] = useState("");
@@ -36,7 +36,7 @@ const NewSignIn = ({ onClose, onSignUp }) => {
                 }></Inputbox>
                 <NewButton text={"Continue"} onClick={
                     ()=>{
-                        axios.post("http://localhost:4500/api/v1/user/signin",{
+                        api.post("/api/v1/user/signin",{
                             username,
                             password
                         })
